@@ -20,10 +20,36 @@ class Chatbot():
         Handle the request.
         """
         self.messages.append({"role": "user", "content": request})
+        self.prune_messages()
+        print("Messages:")
+        for message in self.messages:
+            print(f"{message['role']}: {message['content']}")
         response = self.client.chat.completions.create(
             model=self.model,
             temperature=0, # low to reduce randomness
             messages=self.messages
         )
         response = response.choices[0].message.content
+        self.messages.append({"role": "assistant", "content": response})
         return response
+
+    def prune_messages(self, M=5, N=3):
+        """
+        Prune the messages.
+        Keep the last M user and N assistant messages.
+        """
+        user_count = 0
+        assistant_count = 0
+        new_messages = []
+        # Read messages from the end of the message history
+        # Add the last M user and N assistant messages to the new history
+        for message in reversed(self.messages):
+            if message["role"] == "user" and user_count < M:
+                new_messages.insert(0, message)
+                user_count += 1
+            elif message["role"] == "assistant" and assistant_count < N:
+                new_messages.insert(0, message)
+                assistant_count += 1
+            elif message["role"] == "system":
+                new_messages.insert(0, message)
+        self.messages = new_messages
