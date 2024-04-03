@@ -12,10 +12,10 @@ def create_database(db):
     """
     Create the database.
     """
-    # Read json lines from data/faq-qa.json
+    # Read json lines from data/faq_template.json
     # Each line is a json object with a question and an answer
     # Upsert the question and answer into the database
-    # Combine as follows: Q. <question>\nA. <answer>
+    # Combine as follows: Q. <question> A. <answer>
     with open("data/faq_template.json", "r") as file:
         for line in file:
             record = json.loads(line)
