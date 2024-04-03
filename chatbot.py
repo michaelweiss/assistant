@@ -13,7 +13,7 @@ class Chatbot():
         """
         self.messages = []
         self.messages.append({"role": "system", 
-            "content": "You are a helpful assistant. Carefully follow the user's instructions."})
+            "content": """You are a helpful assistant. Give a concise answer. Start with 'Yes' or 'No'. If you don't know the answer say 'Sorry, I don't have the answer to that'."""})
 
     def handle_request(self, request):
         """
@@ -21,9 +21,6 @@ class Chatbot():
         """
         self.messages.append({"role": "user", "content": request})
         self.prune_messages()
-        print("Messages:")
-        for message in self.messages:
-            print(f"{message['role']}: {message['content']}")
         response = self.client.chat.completions.create(
             model=self.model,
             temperature=0, # low to reduce randomness
@@ -33,7 +30,7 @@ class Chatbot():
         self.messages.append({"role": "assistant", "content": response})
         return response
 
-    def prune_messages(self, M=5, N=3):
+    def prune_messages(self, M=3, N=2):
         """
         Prune the messages.
         Keep the last M user and N assistant messages.
