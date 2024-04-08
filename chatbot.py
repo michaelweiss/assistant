@@ -13,7 +13,7 @@ class Chatbot():
         """
         self.messages = []
         self.messages.append({"role": "system", 
-            "content": """You are a helpful assistant. Give a concise answer. Start with 'Yes' or 'No'. If you don't know the answer say 'Sorry, I don't have the answer to that'."""})
+            "content": """You are a helpful assistant. Give a concise answer. If you don't know the answer say 'Sorry, I don't have the answer to that'."""})
 
     def handle_request(self, request):
         """
@@ -21,12 +21,7 @@ class Chatbot():
         """
         self.messages.append({"role": "user", "content": request})
         self.prune_messages()
-        response = self.client.chat.completions.create(
-            model=self.model,
-            temperature=0, # low to reduce randomness
-            messages=self.messages
-        )
-        response = response.choices[0].message.content
+        response = self.get_response(self.messages)
         self.messages.append({"role": "assistant", "content": response})
         return response
 
@@ -50,3 +45,14 @@ class Chatbot():
             elif message["role"] == "system":
                 new_messages.insert(0, message)
         self.messages = new_messages
+
+    def get_response(self, messages):
+        """
+        Get the response to a message history.
+        """
+        response = self.client.chat.completions.create(
+            model=self.model,
+            temperature=0, # low to reduce randomness
+            messages=messages
+        )
+        return response.choices[0].message.content
